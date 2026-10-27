@@ -22,9 +22,11 @@
 }
 
 .squares {
+    position: relative;
     justify-content: center;
+    align-items: center;
     display: flex;
-    background-color: black;
+    background-color: rgb(17, 121, 60);
 }
 
 .squares.white {
@@ -37,6 +39,12 @@
 }
 
 .row-label {
+    position: absolute;
     align-self: center;
     transform: translateX(-60px);
+}
+
+.chess_pieces {
+    height: 70px;
+    width: auto;
 }
