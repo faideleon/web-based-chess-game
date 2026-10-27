@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="canvass">
+        <div class="main_board"></div>
+    </div>
+    <script>
+        const position_col = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+        const main = document.querySelector('.main_board');
+        const chessboard = [];
+
+        let index = 0;
+        let num = 1;
+        for (let i = 0; i < 8; i++) {
+            chessboard[i] = [];
+            for (let j = 0; j < 8; j++) {
+                const element = document.createElement("div");
+                element.classList.add("squares");
+                if ((i + j) % 2 === 0) {
+                    element.classList.add('white');
+                }
+                if (i === 7) {
+                    element.innerHTML += `<span class="col-label">${position_col[index++]}</span>`;
+                }
+
+                if (j === 0) {
+
+                    element.innerHTML += `<span class="row-label"> ${num++}</span>`;
+                }
+                chessboard[i][j] = element;
+                main.append(element);
+            }
+
+        }
+
+
+
+
+
+    </script>
+</body>
+
+</html>

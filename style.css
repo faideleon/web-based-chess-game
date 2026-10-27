@@ -1,0 +1,42 @@
+* {
+    margin: 0;
+}
+
+.canvass {
+    background-color: rgb(210, 214, 189);
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.main_board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 600px;
+    aspect-ratio: 1;
+
+}
+
+.squares {
+    justify-content: center;
+    display: flex;
+    background-color: black;
+}
+
+.squares.white {
+    background-color: white;
+}
+
+.col-label {
+    transform: translateY(25px);
+    align-self: flex-end;
+}
+
+.row-label {
+    align-self: center;
+    transform: translateX(-60px);
+}
