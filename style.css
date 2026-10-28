@@ -45,6 +45,19 @@
 }
 
 .chess_pieces {
+    position: absolute;
     height: 70px;
     width: auto;
+}
+
+.circles {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    z-index: 999;
+    height: 20px;
+    aspect-ratio: 1;
+    background-color: black;
+    border-radius: 50%;
 }

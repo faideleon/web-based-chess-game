@@ -1,6 +1,7 @@
 const chessboard = [];
 instantiatingboard();
 instantiatingPieces();
+pieceMovements();
 
 function instantiatingboard() {
     const position_col = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -9,7 +10,7 @@ function instantiatingboard() {
 
 
     let index = 0;
-    let num = 1;
+    let num = 8;
     for (let i = 0; i < 8; i++) {
         chessboard[i] = [];
         for (let j = 0; j < 8; j++) {
@@ -24,9 +25,12 @@ function instantiatingboard() {
 
             if (j === 0) {
 
-                element.innerHTML += `<span class="row-label"> ${num++}</span>`;
+                element.innerHTML += `<span class="row-label"> ${num--}</span>`;
             }
             chessboard[i][j] = element;
+            element.dataset.row = i;
+            element.dataset.col = j;
+            element.dataset.currentlyClicked = false;
             main.append(element);
         }
     }
@@ -47,12 +51,12 @@ function instantiatingPieces() {
                 else if (j === 4) { chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_kdt45.svg">`; }
                     break;
                 case 1: {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_pdt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces pawn black" src="ChessPieces/Chess_pdt45.svg">`;
                     break;
                 }
 
                 case 6: {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_plt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces pawn white" src="ChessPieces/Chess_plt45.svg">`;
                     break;
                 }
                 case 7: {
@@ -63,12 +67,60 @@ function instantiatingPieces() {
                     }
                     else if (j === 2 || j === 5) {
                         chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_blt45.svg">`;
-                    } else if (j === 4) { chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_qlt45.svg">`; }
-                    else if (j === 3) { chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_klt45.svg">`; }
+                    } else if (j === 3) { chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_qlt45.svg">`; }
+                    else if (j === 4) { chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_klt45.svg">`; }
                     break;
                 }
             }
 
         }
     }
+}
+
+function pieceMovements() {
+    pawnMovement();
+    rookMovement();
+    knightMovement();
+    bishopMovement();
+    queenMovement();
+    kingMovement();
+}
+
+function pawnMovement() {
+    let alreadySelected = false;
+    let previousPawn;
+    const pawns = document.querySelectorAll(".chess_pieces.pawn");
+    pawns.forEach(pawn => {
+        pawn.addEventListener("click", () => {
+
+
+            const row = Number(pawn.parentElement.dataset.row);
+            const col = Number(pawn.parentElement.dataset.col);
+
+            if (alreadySelected) {
+                document.querySelectorAll(".circles").forEach((c) => {
+                    c.remove();
+                })
+                alreadySelected = false;
+                if (previousPawn === pawn) {
+                    return;
+                }
+
+            }
+
+
+            if (row === 6 && pawn.classList.contains("white")) {
+                let i = 1;
+                while (i < 3) {
+                    const circle = document.createElement("div");
+                    circle.classList.add("circles");
+                    chessboard[row - i++][col].appendChild(circle);
+                }
+                previousPawn = pawn;
+                alreadySelected = true;
+
+            }
+
+        })
+    });
 }
