@@ -93,20 +93,30 @@ function pawnMovement() {
     pawns.forEach(pawn => {
         pawn.addEventListener("click", () => {
 
-
+            pawn.style.opacity = "0.5";
             const row = Number(pawn.parentElement.dataset.row);
             const col = Number(pawn.parentElement.dataset.col);
 
             if (alreadySelected) {
-                document.querySelectorAll(".circles").forEach((c) => {
-                    c.remove();
-                })
+
                 alreadySelected = false;
                 if (previousPawn === pawn) {
+                    pawn.style.opacity = "1.0";
+                    document.querySelectorAll(".circles").forEach((c) => {
+                        c.remove();
+                    })
                     return;
+                } else {
+                    previousPawn.style.opacity = "1.0";
+                    document.querySelectorAll(".circles").forEach((c) => {
+                        c.remove();
+                    })
                 }
 
             }
+
+
+
 
 
             if (row === 6 && pawn.classList.contains("white")) {
