@@ -8,11 +8,6 @@ instantiatingPieces();
 gameManager();
 function gameManager() {
 
-
-
-
-    const black_pieces = document.querySelectorAll(".chess_pieces.black");
-    const white_pieces = document.querySelectorAll(".chess_pieces.white");
     selectPieces();
 
 }
@@ -152,7 +147,11 @@ function selectPieces() {
 
             switch (typePiece) {
                 case "pawn": {
-                    showMoves(row, col, whiteToPlay ? [[-1, 0]] : [[1, 0]], whiteToPlay ? row === 6 ? 2 : 1 : row === 1 ? 2 : 1);
+                    const left = whiteToPlay ? chessboard[row - 1][col - 1] : chessboard[row + 1][col - 1];
+                    const right = whiteToPlay ? chessboard[row - 1][col + 1] : chessboard[row + 1][col + 1];
+                    console.log("left", left, right);
+
+                    showMoves("pawn", row, col, whiteToPlay ? [[-1, 0], left?.querySelector(".chess_pieces")?.classList.contains("black") ? [-1, -1] : null, right?.querySelector(".chess_pieces")?.classList.contains("black") ? [-1, 1] : null] : [[1, 0], left?.querySelector(".chess_pieces")?.classList.contains("white") ? [1, -1] : null, right?.querySelector(".chess_pieces")?.classList.contains("white") ? [1, 1] : null], whiteToPlay ? row === 6 ? 2 : 1 : row === 1 ? 2 : 1);
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
@@ -167,7 +166,7 @@ function selectPieces() {
 
 
                 case "rook": {
-                    showMoves(row, col, rook_direction, 8);
+                    showMoves("rook", row, col, rook_direction, 8);
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
@@ -180,7 +179,7 @@ function selectPieces() {
                 }
 
                 case "knight": {
-                    showMoves(row, col, knight_direction, 1);
+                    showMoves("knight", row, col, knight_direction, 1);
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
@@ -192,7 +191,7 @@ function selectPieces() {
                     break;
                 }
                 case "bishop": {
-                    showMoves(row, col, bishop_direction, 8);
+                    showMoves("bishop", row, col, bishop_direction, 8);
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
@@ -204,7 +203,7 @@ function selectPieces() {
                     break;
                 }
                 case "queen": {
-                    showMoves(row, col, queen_direction, 8);
+                    showMoves("queen", row, col, queen_direction, 8);
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
@@ -217,7 +216,7 @@ function selectPieces() {
                     break;
                 }
                 case "king": {
-                    showMoves(row, col, king_direction, whiteToPlay ? (!(chessboard[7][5].dataset.isOccupied === "true") && !(chessboard[7][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[7][1].dataset.isOccupied === "true") && !(chessboard[7][2].dataset.isOccupied === "true") && !(chessboard[7][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1 : (!(chessboard[0][5].dataset.isOccupied === "true") && !(chessboard[0][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[0][1].dataset.isOccupied === "true") && !(chessboard[0][2].dataset.isOccupied === "true") && !(chessboard[0][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1);
+                    showMoves("king", row, col, king_direction, whiteToPlay ? (!(chessboard[7][5].dataset.isOccupied === "true") && !(chessboard[7][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[7][1].dataset.isOccupied === "true") && !(chessboard[7][2].dataset.isOccupied === "true") && !(chessboard[7][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1 : (!(chessboard[0][5].dataset.isOccupied === "true") && !(chessboard[0][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[0][1].dataset.isOccupied === "true") && !(chessboard[0][2].dataset.isOccupied === "true") && !(chessboard[0][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1);
                     document.querySelectorAll(".circles").forEach(c => {
                         console.log(c.parentElement);
                         c.addEventListener("click", () => {
@@ -270,7 +269,7 @@ function kingSideCastle() {
 
 function moveToPosition(piece, newRow, newCol, row, col) {
     let newPosition = chessboard[newRow][newCol];
-
+    newPosition.innerHTML = "";
     newPosition.appendChild(piece);
     newPosition.dataset.isOccupied = true;
     console.log(newPosition)
@@ -283,8 +282,11 @@ function moveToPosition(piece, newRow, newCol, row, col) {
 }
 
 
-function showMoves(row, col, directions, maxSteps) {
+function showMoves(piece, row, col, directions, maxSteps) {
     for (const direction of directions) {
+        if (direction === null) {
+            continue;
+        }
         let r = row;
         let c = col;
 
@@ -298,13 +300,34 @@ function showMoves(row, col, directions, maxSteps) {
 
             console.log("row: " + r + " column: " + c)
 
+
+            if (whiteToPlay ? (chessboard[r][c]?.querySelector(".chess_pieces")?.classList.contains("white")) : chessboard[r][c]?.querySelector(".chess_pieces")?.classList.contains("black")) {
+                break;
+            }
+
+            if (piece === "pawn" && whiteToPlay ? ((direction[0] === -1 && direction[1] === 0) && chessboard[r][c].dataset.isOccupied === "true") : (direction[0] === 1 && direction[1] === 0) && chessboard[r][c].dataset.isOccupied === "true") {
+                break;
+            }
+
+
+
+
+            const circle = document.createElement("div");
+            circle.classList.add("circles");
+            circle.style.zIndex = "10";
+            chessboard[r][c].appendChild(circle);
+            console.log("chessboard", chessboard[r][c])
+
             if (chessboard[r][c].dataset.isOccupied === "true") {
                 break;
             }
 
-            const circle = document.createElement("div");
-            circle.classList.add("circles");
-            chessboard[r][c].appendChild(circle);
+
+
+
+            if (piece === "pawn" && ((direction[0] === -1 && direction[1] === -1) || (direction[0] === -1 && direction[1] === 1) || (direction[0] === 1 && direction[1] === -1) || (direction[0] === 1 && direction[1] === 1))) {
+                break;
+            }
         }
     }
 }
