@@ -1,7 +1,22 @@
 const chessboard = [];
+let whiteToPlay = true;
+let gameIsOver = false;
+
+
 instantiatingboard();
 instantiatingPieces();
-pieceMovements();
+gameManager();
+function gameManager() {
+
+
+
+
+    const black_pieces = document.querySelectorAll(".chess_pieces.black");
+    const white_pieces = document.querySelectorAll(".chess_pieces.white");
+    selectPieces();
+
+}
+
 
 function instantiatingboard() {
     const position_col = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -41,22 +56,22 @@ function instantiatingPieces() {
         for (let j = 0; j < 8; j++) {
             switch (i) {
                 case 0: if (j === 0 || j === 7) {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_rdt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces rook black" src="ChessPieces/Chess_rdt45.svg">`;
                     chessboard[i][j].dataset.isOccupied = true;
 
                 } else if (j === 1 || j === 6) {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_ndt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces knight black" src="ChessPieces/Chess_ndt45.svg">`;
                     chessboard[i][j].dataset.isOccupied = true;
                 }
                 else if (j === 2 || j === 5) {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_bdt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces bishop black" src="ChessPieces/Chess_bdt45.svg">`;
                     chessboard[i][j].dataset.isOccupied = true;
                 } else if (j === 3) {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_qdt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces queen black" src="ChessPieces/Chess_qdt45.svg">`;
                     chessboard[i][j].dataset.isOccupied = true;
                 }
                 else if (j === 4) {
-                    chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_kdt45.svg">`;
+                    chessboard[i][j].innerHTML += `<img class="chess_pieces king black" src="ChessPieces/Chess_kdt45.svg">`;
                     chessboard[i][j].dataset.isOccupied = true;
                 }
                     break;
@@ -99,88 +114,6 @@ function instantiatingPieces() {
     }
 }
 
-function pieceMovements() {
-    selectPieces();
-}
-
-function pawnMovement() {
-    let alreadySelected = false;
-    let previousPawn;
-    const pawns = document.querySelectorAll(".chess_pieces.pawn");
-    pawns.forEach(pawn => {
-        pawn.addEventListener("click", () => {
-
-
-            const row = Number(pawn.parentElement.dataset.row);
-            const col = Number(pawn.parentElement.dataset.col);
-
-            if (alreadySelected) {
-                document.querySelectorAll(".circles").forEach((c) => {
-                    c.remove();
-                })
-                alreadySelected = false;
-                if (previousPawn === pawn) {
-                    return;
-                }
-
-            }
-
-
-            if (row === 6 && pawn.classList.contains("white")) {
-                let i = 1;
-                while (i < 3) {
-                    const circle = document.createElement("div");
-                    circle.classList.add("circles");
-                    chessboard[row - i++][col].appendChild(circle);
-                }
-                previousPawn = pawn;
-                alreadySelected = true;
-
-            }
-
-        })
-    });
-}
-
-function rookMovement() {
-    let alreadySelected = false;
-    let previousRook;
-    const rooks = document.querySelectorAll(".chess_pieces.rook");
-    rooks.forEach(rook => {
-        rook.addEventListener("click", () => {
-
-
-            const row = Number(rook.parentElement.dataset.row);
-            const col = Number(rook.parentElement.dataset.col);
-
-            if (alreadySelected) {
-                document.querySelectorAll(".circles").forEach((c) => {
-                    c.remove();
-                })
-                alreadySelected = false;
-                if (previousRook === rook) {
-                    return;
-                }
-
-            }
-
-
-            if (row === 7 && rook.classList.contains("white")) {
-                let i = 1;
-                while (i < 3) {
-                    const circle = document.createElement("div");
-                    circle.classList.add("circles");
-                    chessboard[row - i++][col].appendChild(circle);
-                }
-                previousrook = rook;
-                alreadySelected = true;
-
-            }
-
-        })
-    });
-}
-
 const pawn_direction = [[-1, 0]]
 const rook_direction = [[0, 1], [0, -1], [1, 0], [-1, 0]]
 const knight_direction = [[2, 1], [2, -1], [-1, -2], [1, -2], [1, 2], [-1, 2], [-2, 1], [-2, -1]];
@@ -196,9 +129,13 @@ function selectPieces() {
     let previousPiece;
     const type = ["pawn", "rook", "knight", "bishop", "queen", "king"];
 
-    const white_pieces = document.querySelectorAll(".chess_pieces.white");
-    white_pieces.forEach(piece => {
+    const _pieces = document.querySelectorAll(".chess_pieces");
+    _pieces.forEach(piece => {
         piece.addEventListener("click", () => {
+            if (piece.classList.contains("white") !== whiteToPlay) {
+                return
+            }
+
             const row = Number(piece.parentElement.dataset.row);
             const col = Number(piece.parentElement.dataset.col);
 
@@ -215,13 +152,16 @@ function selectPieces() {
 
             switch (typePiece) {
                 case "pawn": {
-                    showMoves(row, col, pawn_direction, row === 6 ? 2 : 1);
+                    showMoves(row, col, whiteToPlay ? [[-1, 0]] : [[1, 0]], whiteToPlay ? row === 6 ? 2 : 1 : row === 1 ? 2 : 1);
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+
+                            whiteToPlay = !whiteToPlay;
                         })
 
                     })
+
                     break;
                 }
 
@@ -231,9 +171,11 @@ function selectPieces() {
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                            whiteToPlay = !whiteToPlay;
                         })
 
                     })
+
                     break;
                 }
 
@@ -242,9 +184,11 @@ function selectPieces() {
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                            whiteToPlay = !whiteToPlay;
                         })
 
                     })
+
                     break;
                 }
                 case "bishop": {
@@ -252,9 +196,11 @@ function selectPieces() {
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                            whiteToPlay = !whiteToPlay;
                         })
 
                     })
+
                     break;
                 }
                 case "queen": {
@@ -262,24 +208,30 @@ function selectPieces() {
                     document.querySelectorAll(".circles").forEach(c => {
                         c.addEventListener("click", () => {
                             moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                            whiteToPlay = !whiteToPlay;
+                            console.log("clicked", piece.className, "whiteToPlay:", whiteToPlay);
                         })
 
                     })
+
                     break;
                 }
                 case "king": {
-                    showMoves(row, col, king_direction, (!(chessboard[7][5].dataset.isOccupied === "true") && !(chessboard[7][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[7][1].dataset.isOccupied === "true") && !(chessboard[7][2].dataset.isOccupied === "true") && !(chessboard[7][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1);
+                    showMoves(row, col, king_direction, whiteToPlay ? (!(chessboard[7][5].dataset.isOccupied === "true") && !(chessboard[7][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[7][1].dataset.isOccupied === "true") && !(chessboard[7][2].dataset.isOccupied === "true") && !(chessboard[7][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1 : (!(chessboard[0][5].dataset.isOccupied === "true") && !(chessboard[0][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[0][1].dataset.isOccupied === "true") && !(chessboard[0][2].dataset.isOccupied === "true") && !(chessboard[0][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1);
                     document.querySelectorAll(".circles").forEach(c => {
+                        console.log(c.parentElement);
                         c.addEventListener("click", () => {
-                            if (c.parentElement === chessboard[7][6]) {
+                            const square = c.parentElement;
+                            if (whiteToPlay ? square === chessboard[7][6] : square === chessboard[0][6]) {
                                 console.log("went in here")
                                 kingSideCastle();
-                            } else if (c.parentElement === chessboard[7][2]) {
+                            } else if (whiteToPlay ? square === chessboard[7][2] : square === chessboard[0][2]) {
                                 console.log("went queenside");
                                 queenSideCastle();
                             }
-                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                            moveToPosition(piece, Number(square.dataset.row), Number(square.dataset.col), row, col);
                             piece.dataset.hasMoved = true;
+                            whiteToPlay = !whiteToPlay;
                         })
 
                     })
@@ -294,21 +246,25 @@ function selectPieces() {
 }
 
 function queenSideCastle() {
-    const king = document.querySelector(".king.white");
-    const rook = Array.from(document.querySelectorAll(".rook.white")).find(rook => rook.parentElement === chessboard[7][0])
+    const king = whiteToPlay ? document.querySelector(".king.white") : document.querySelector(".king.black");
+    const rook = whiteToPlay ? Array.from(document.querySelectorAll(".rook.white")).find(rook => rook.parentElement === chessboard[7][0]) :
+        Array.from(document.querySelectorAll(".rook.black")).find(rook => rook.parentElement === chessboard[0][0])
     console.log(rook.parentElement.dataset.row, rook.parentElement.dataset.col);
-    moveToPosition(rook, 7, 3, rook.parentElement.dataset.row, rook.parentElement.dataset.col)
-    moveToPosition(king, 7, 2, king.parentElement.dataset.row, king.parentElement.dataset.col)
+    moveToPosition(rook, whiteToPlay ? 7 : 0, 3, rook.parentElement.dataset.row, rook.parentElement.dataset.col)
+    moveToPosition(king, whiteToPlay ? 7 : 0, 2, king.parentElement.dataset.row, king.parentElement.dataset.col)
     king.dataset.hasMoved = true;
 }
 
 function kingSideCastle() {
-    const king = document.querySelector(".king.white");
-    const rook = Array.from(document.querySelectorAll(".rook.white")).find(rook => rook.parentElement === chessboard[7][7])
+    const king = whiteToPlay ? document.querySelector(".king.white") : document.querySelector(".king.black");
+    const rook = whiteToPlay ? Array.from(document.querySelectorAll(".rook.white")).find(rook => rook.parentElement === chessboard[7][7]) :
+        Array.from(document.querySelectorAll(".rook.black")).find(rook => rook.parentElement === chessboard[0][7])
+
     console.log(rook.parentElement.dataset.row, rook.parentElement.dataset.col);
-    moveToPosition(rook, 7, 5, rook.parentElement.dataset.row, rook.parentElement.dataset.col)
-    moveToPosition(king, 7, 6, king.parentElement.dataset.row, king.parentElement.dataset.col)
+    moveToPosition(rook, whiteToPlay ? 7 : 0, 5, rook.parentElement.dataset.row, rook.parentElement.dataset.col)
+    moveToPosition(king, whiteToPlay ? 7 : 0, 6, king.parentElement.dataset.row, king.parentElement.dataset.col)
     king.dataset.hasMoved = true;
+
 }
 
 
@@ -335,6 +291,8 @@ function showMoves(row, col, directions, maxSteps) {
         for (let step = 1; step <= maxSteps; step++) {
             r = r + direction[0];
             c = c + direction[1];
+
+            console.log(r, c);
 
             if (r < 0 || r > 7 || c < 0 || c > 7) break;
 
