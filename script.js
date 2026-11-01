@@ -80,15 +80,16 @@ function instantiatingPieces() {
                         chessboard[i][j].dataset.isOccupied = true;
                     }
                     else if (j === 2 || j === 5) {
-                        chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_blt45.svg">`;
+                        chessboard[i][j].innerHTML += `<img class="chess_pieces bishop white" src="ChessPieces/Chess_blt45.svg">`;
                         chessboard[i][j].dataset.isOccupied = true;
                     } else if (j === 3) {
-                        chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_qlt45.svg">`;
+                        chessboard[i][j].innerHTML += `<img class="chess_pieces queen white" src="ChessPieces/Chess_qlt45.svg">`;
                         chessboard[i][j].dataset.isOccupied = true;
                     }
                     else if (j === 4) {
-                        chessboard[i][j].innerHTML += `<img class="chess_pieces" src="ChessPieces/Chess_klt45.svg">`;
+                        chessboard[i][j].innerHTML += `<img class="chess_pieces king white" src="ChessPieces/Chess_klt45.svg">`;
                         chessboard[i][j].dataset.isOccupied = true;
+                        document.querySelector('.chess_pieces.king').dataset.hasMoved = false;
                     }
                     break;
                 }
@@ -183,9 +184,9 @@ function rookMovement() {
 const pawn_direction = [[-1, 0]]
 const rook_direction = [[0, 1], [0, -1], [1, 0], [-1, 0]]
 const knight_direction = [[2, 1], [2, -1], [-1, -2], [1, -2], [1, 2], [-1, 2], [-2, 1], [-2, -1]];
-const bishop_direction = [[1, 1], [-1, -1], [1, -1], [-1, 1]]
+const bishop_direction = [[1, 1], [-1, -1], [1, -1], [-1, 1]];
 const queen_direction = [...rook_direction, ...bishop_direction]
-const king_direction = [queen_direction]
+const king_direction = [...queen_direction]
 
 
 
@@ -213,15 +214,77 @@ function selectPieces() {
             })
 
             switch (typePiece) {
-                case "pawn": showMoves(row, col, pawn_direction, row === 6 ? 2 : 1); break;
+                case "pawn": {
+                    showMoves(row, col, pawn_direction, row === 6 ? 2 : 1);
+                    document.querySelectorAll(".circles").forEach(c => {
+                        c.addEventListener("click", () => {
+                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                        })
+
+                    })
+                    break;
+                }
 
 
-                case "rook": showMoves(row, col, rook_direction, 8); break;
+                case "rook": {
+                    showMoves(row, col, rook_direction, 8);
+                    document.querySelectorAll(".circles").forEach(c => {
+                        c.addEventListener("click", () => {
+                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                        })
 
-                case "knight": showMoves(row, col, knight_direction, 1); break;
-                case "bishop": showMoves(row, col, bishop_direction, 8); break;
-                case "queen": showMoves(row, col, queen_direction, 8); break;
-                case "king": showMoves(row, col, king_direction, 1); break;
+                    })
+                    break;
+                }
+
+                case "knight": {
+                    showMoves(row, col, knight_direction, 1);
+                    document.querySelectorAll(".circles").forEach(c => {
+                        c.addEventListener("click", () => {
+                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                        })
+
+                    })
+                    break;
+                }
+                case "bishop": {
+                    showMoves(row, col, bishop_direction, 8);
+                    document.querySelectorAll(".circles").forEach(c => {
+                        c.addEventListener("click", () => {
+                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                        })
+
+                    })
+                    break;
+                }
+                case "queen": {
+                    showMoves(row, col, queen_direction, 8);
+                    document.querySelectorAll(".circles").forEach(c => {
+                        c.addEventListener("click", () => {
+                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                        })
+
+                    })
+                    break;
+                }
+                case "king": {
+                    showMoves(row, col, king_direction, (!(chessboard[7][5].dataset.isOccupied === "true") && !(chessboard[7][6].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 2 : (!(chessboard[7][1].dataset.isOccupied === "true") && !(chessboard[7][2].dataset.isOccupied === "true") && !(chessboard[7][3].dataset.isOccupied === "true") && !(piece.dataset.hasMoved === "true")) ? 3 : 1);
+                    document.querySelectorAll(".circles").forEach(c => {
+                        c.addEventListener("click", () => {
+                            if (c.parentElement === chessboard[7][6]) {
+                                console.log("went in here")
+                                kingSideCastle();
+                            } else if (c.parentElement === chessboard[7][2]) {
+                                console.log("went queenside");
+                                queenSideCastle();
+                            }
+                            moveToPosition(piece, Number(c.parentElement.dataset.row), Number(c.parentElement.dataset.col), row, col);
+                            piece.dataset.hasMoved = true;
+                        })
+
+                    })
+                    break;
+                }
             }
             previousPiece = piece;    // add
             alreadySelected = true;
@@ -229,6 +292,40 @@ function selectPieces() {
         });
     });
 }
+
+function queenSideCastle() {
+    const king = document.querySelector(".king.white");
+    const rook = Array.from(document.querySelectorAll(".rook.white")).find(rook => rook.parentElement === chessboard[7][0])
+    console.log(rook.parentElement.dataset.row, rook.parentElement.dataset.col);
+    moveToPosition(rook, 7, 3, rook.parentElement.dataset.row, rook.parentElement.dataset.col)
+    moveToPosition(king, 7, 2, king.parentElement.dataset.row, king.parentElement.dataset.col)
+    king.dataset.hasMoved = true;
+}
+
+function kingSideCastle() {
+    const king = document.querySelector(".king.white");
+    const rook = Array.from(document.querySelectorAll(".rook.white")).find(rook => rook.parentElement === chessboard[7][7])
+    console.log(rook.parentElement.dataset.row, rook.parentElement.dataset.col);
+    moveToPosition(rook, 7, 5, rook.parentElement.dataset.row, rook.parentElement.dataset.col)
+    moveToPosition(king, 7, 6, king.parentElement.dataset.row, king.parentElement.dataset.col)
+    king.dataset.hasMoved = true;
+}
+
+
+function moveToPosition(piece, newRow, newCol, row, col) {
+    let newPosition = chessboard[newRow][newCol];
+
+    newPosition.appendChild(piece);
+    newPosition.dataset.isOccupied = true;
+    console.log(newPosition)
+    chessboard[row][col].innerHTML = "";
+    chessboard[row][col].dataset.isOccupied = false;
+    document.querySelectorAll(".circles").forEach(c => {
+        c.remove();
+    })
+
+}
+
 
 function showMoves(row, col, directions, maxSteps) {
     for (const direction of directions) {
@@ -240,6 +337,8 @@ function showMoves(row, col, directions, maxSteps) {
             c = c + direction[1];
 
             if (r < 0 || r > 7 || c < 0 || c > 7) break;
+
+            console.log("row: " + r + " column: " + c)
 
             if (chessboard[r][c].dataset.isOccupied === "true") {
                 break;
