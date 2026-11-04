@@ -286,15 +286,90 @@ function moveToPosition(piece, newRow, newCol, row, col) {
     newPosition.innerHTML = "";
     newPosition.appendChild(piece);
     newPosition.dataset.isOccupied = true;
+
     console.log(newPosition)
     chessboard[row][col].innerHTML = "";
     chessboard[row][col].dataset.isOccupied = false;
+    markHeldSquares(piece, newRow, newCol);
     document.querySelectorAll(".circles").forEach(c => {
 
         c.remove();
 
     })
+}
 
+function markHeldSquares(pieceE1, row, col) {
+    let directions;
+
+    const piece = ["pawn", "rook", "knight", "bishop", "queen", "king"
+    ].find(t => {
+        return pieceE1.classList.contains(t);
+    })
+
+    console.log(piece);
+    let maxSteps;
+
+    switch (piece) {
+        case "pawn": directions = pawn_direction; maxSteps = 1;
+            break;
+        case "rook": directions = rook_direction; maxSteps = 8; break;
+        case "knight": directions = knight_direction; maxSteps = 1;
+            break;
+        case "bishop": directions = bishop_direction; maxStepss = 8;
+            break;
+        case "queen": directions = queen_direction; maxSteps = 8;
+            break;
+        case "king": directions = king_direction; maxSteps = 1;
+            break;
+    }
+
+    for (const direction of directions) {
+        if (direction === null) {
+            continue;
+        }
+        let r = row;
+        let c = col;
+
+
+
+        for (let step = 1; step <= maxSteps; step++) {
+            r = r + direction[0];
+            c = c + direction[1];
+
+
+
+            if (r < 0 || r > 7 || c < 0 || c > 7) break;
+
+            if (piece === "king" && (whiteToPlay ? (chessboard[r][c].dataset.heldByBlack) : (chessboard[r][c].dataset.heldByWhite))) {
+                break;
+            }
+
+
+            if (whiteToPlay ? (chessboard[r][c]?.querySelector(".chess_pieces")?.classList.contains("white")) : (chessboard[r][c]?.querySelector(".chess_pieces")?.classList.contains("black"))) {
+                break;
+            }
+
+            if (piece === "pawn" && (whiteToPlay ? ((direction[0] === -1 && direction[1] === 0) && chessboard[r][c].dataset.isOccupied === "true") : (direction[0] === 1 && direction[1] === 0) && chessboard[r][c].dataset.isOccupied === "true")) {
+                break;
+            }
+
+            if (chessboard[r][c].dataset.isOccupied === "true") {
+                break;
+            }
+
+
+            if (piece === "pawn" && ((direction[0] === -1 && direction[1] === -1) || (direction[0] === -1 && direction[1] === 1) || (direction[0] === 1 && direction[1] === -1) || (direction[0] === 1 && direction[1] === 1))) {
+                break;
+            }
+
+            if (piece !== "pawn") {
+                whiteToPlay ? (chessboard[r][c].dataset.heldByWhite = true) : (chessboard[r][c].dataset.heldByBlack = true);
+            }
+            console.log("holding tile: ", chessboard[r][c])
+
+
+        }
+    }
 }
 
 
@@ -350,15 +425,8 @@ function showMoves(piece, row, col, directions, maxSteps) {
                 break;
             }
 
-            if (piece !== "pawn") { whiteToPlay ? (chessboard[r][c].dataset.heldByWhite = true) : (chessboard[r][c].dataset.heldByBlack = true); }
-            else {
-                if (whiteToPlay ? (direction[0] !== -1 && direction[1] !== 0) : (direction[0] !== 1 && direction[1] !== 0)) {
-
-                }
 
 
-            }
-            console.log("chessboard: ", chessboard[r][c])
         }
     }
 }
